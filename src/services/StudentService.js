@@ -26,4 +26,11 @@ export async function teacherAddTeacher(params) {
   return request(`${student}/think/student/add/teacher`,{method:"POST",body:params})
 }
 
+export async function teacherGetDepart() {
+  return request(`${student}/think/student/find/depart`,{})
+}
+export async function teacherGetProf() {
+  return request(`${student}/think/student/find/prof`,{})
+}
+
 

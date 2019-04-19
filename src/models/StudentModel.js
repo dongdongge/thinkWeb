@@ -1,6 +1,5 @@
 /* eslint-disable max-len,no-trailing-spaces */
 /* eslint-disable no-undef */
-import { routerRedux } from 'dva/router';
 import {
   studentFindStudentAll,
   studentFindClassAll,
@@ -29,7 +28,6 @@ export default {
   effects: {
     * getStudentList({ payload: { params } }, { call, put }) {
       const studentItems = yield call(studentFindStudentAll, {});
-      console.log('studentItems', studentItems);
       yield put({ type: 'saveList', payload: { studentItems: studentItems } });
     },
     * getStudentClass({ payload }, { call, put }) {
@@ -44,6 +42,5 @@ export default {
       yield call(studentDeleteStudent, payload);
       yield put({ type: 'getStudentList', payload: {} });
     }
-
   },
 };

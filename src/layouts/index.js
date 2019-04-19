@@ -13,6 +13,7 @@ export default class MainLayout extends React.PureComponent{
   }
   render() {
     const {pathname} = this.props.location;
+    console.log("路由："+pathname);
     const matchRoute = this.props.route.routes.filter(item => item.path === pathname)
     const flag = matchRoute && matchRoute.length > 0 // 匹配到路由
     return (

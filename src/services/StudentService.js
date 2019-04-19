@@ -13,3 +13,17 @@ export async function studentAddStudent(params) {
 export async function studentDeleteStudent(params) {
   return request(`${student}/think/student/delete/student/${params.sno}`,{method:"DELETE"});
 }
+export async function courseFindCourseAll() {
+  return request(`${student}/think/student/find/course`,{});
+}
+export async function courseAddCourse(params) {
+  return request(`${student}/think/student/add/course`,{method:"POST",body:params});
+}
+export async function teacherFindTeacher() {
+  return request(`${student}/think/student/find/teacher`,{});
+}
+export async function teacherAddTeacher(params) {
+  return request(`${student}/think/student/add/teacher`,{method:"POST",body:params})
+}
+
+

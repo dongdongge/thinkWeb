@@ -1,36 +1,49 @@
 /* eslint-disable max-len,no-trailing-spaces */
 /* eslint-disable no-undef */
 import { routerRedux } from 'dva/router';
-import { studentFindStudentAll,studentFindClassAll,studentAddStudent } from '@/services/StudentService';
+import {
+  studentFindStudentAll,
+  studentFindClassAll,
+  studentAddStudent,
+  studentDeleteStudent,
+} from '@/services/StudentService';
 
 export default {
   namespace: 'student',
   state: {
     studentItems: [],
-    page:1,
-    queryValues:{},
-    total:null
+    page: 1,
+    queryValues: {},
+    classData: [],
+    total: null,
   },
   reducers: {
     saveList(state, { payload: { studentItems } }) {
-      return { ...state, studentItems}
+      return { ...state, studentItems };
+    },
+    saveClass(state, { payload: { classData } }) {
+      return { ...state, classData };
     },
   },
 
   effects: {
     * getStudentList({ payload: { params } }, { call, put }) {
-      const studentItems = yield call(studentFindStudentAll,{});
-      console.log(studentItems)
-      yield put({type:'saveList',payload:{studentItems:studentItems.data}});
+      const studentItems = yield call(studentFindStudentAll, {});
+      console.log('studentItems', studentItems);
+      yield put({ type: 'saveList', payload: { studentItems: studentItems } });
     },
-    * getStudentClass({payload:{params}},{call,put}){
-      const classData = yield call(studentFindClassAll,{});
-      if (classData&&params.callback){
-        params.callback(classData.data)
-      }
+    * getStudentClass({ payload }, { call, put }) {
+      const classData = yield call(studentFindClassAll, {});
+      yield put({ type: 'saveClass', payload: { classData } });
     },
-    * addStudent({payload:{params}},{call,put}){
-      const res = yield call(studentAddStudent,params);
+    * addStudent({ payload }, { call, put }) {
+      yield call(studentAddStudent, payload.params);
+      yield put({ type: 'getStudentList', payload: {} });
+    },
+    * deleteStudent({payload},{call,put}){
+      yield call(studentDeleteStudent, payload);
+      yield put({ type: 'getStudentList', payload: {} });
     }
+
   },
 };

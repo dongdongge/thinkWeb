@@ -10,3 +10,6 @@ export async function studentFindClassAll() {
 export async function studentAddStudent(params) {
   return request(`${student}/think/student/add/student`,{method:"POST",body:params});
 }
+export async function studentDeleteStudent(params) {
+  return request(`${student}/think/student/delete/student/${params.sno}`,{method:"DELETE"});
+}

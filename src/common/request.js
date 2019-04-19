@@ -22,17 +22,13 @@ function checkStatus(response) {
 }
 
 function checkData(resData) {
-  // mock跳过检查
-  if (typeof (resData.status) === 'undefined') {
-    return resData
+  console.log("checkData",resData);
+  if (resData.code === 0) {
+    return resData.data||{}
   }
-
-  if (resData.status === 0) {
-    return resData.data
-  }
-  const error = new Error(resData.error.message)
-  error.code = resData.error.code
-  error.response = resData
+  const error = new Error(resData.message);
+  error.code = resData.code;
+  error.response = resData;
   throw error
 }
 
@@ -50,14 +46,16 @@ export default function request(url, options) {
       authorization: `${Authorization}`,
     },
   };
-  const newOptions = { ...defaultOptions, ...options }
+  const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT' || newOptions.method === 'DELETE') {
     newOptions.headers = {
       Accept: 'application/json',
       'Content-Type': 'application/json; charset=utf-8',
       ...newOptions.headers,
     };
-    newOptions.body = JSON.stringify(newOptions.body)
+    if (newOptions.body){
+      newOptions.body = JSON.stringify(newOptions.body)
+    }
   }
 
   return fetchData(url, newOptions)
@@ -83,8 +81,8 @@ export function postFile(url, options) {
 }
 
 function fetchData(url, options) {
-  console.log("fetchData");
-  console.log(options);
+  console.log("fetchData",url);
+  console.log("options",options);
   return fetch(url, options)
     .then(checkStatus)
     .then(handelAuth)

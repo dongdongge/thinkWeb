@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react';
-import { Table, Divider, Tag, Popconfirm, Button, Modal, Input, Select, DatePicker, Form } from 'antd';
+import { Table, Divider, Tag, Popconfirm, Button, Modal, Input,message, Select, DatePicker, Form } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import * as _ from 'lodash';
@@ -16,28 +16,20 @@ class AddModuleStudent extends Component {
     };
   }
 
-  handleSearch = () => {
-    const params = {
-      callback: (data) => {
-        this.setState({ data });
-      },
-    };
-    this.props.dispatch({ type: 'student/getStudentClass', payload: { params } });
-  };
 
   render() {
-    const { visible, onCancel, onCreate, form } = this.props;
+    const { visible, onCancel, onCreate, form, classData } = this.props;
     const { getFieldDecorator } = form;
-    const options = this.state.data.map(d => <Option key={d.id}>{d.cno}</Option>);
+    const options = classData.map(d => <Option key={d.id} value={d.cno}>{d.cno}</Option>);
     return (
       <Form layout="vertical">
         <Form.Item label="学号">
           {getFieldDecorator('sno', { rules: [{ required: true, message: 'Please input the 学号 of collection!' }] })(
-            <input type={'number'}/>)}
+            <Input type={'number'}/>)}
         </Form.Item>
         <Form.Item label="姓名">
           {getFieldDecorator('sname', { rules: [{ required: true, message: 'Please input the 姓名 of collection!' }] })(
-            <input/>)}
+            <Input/>)}
         </Form.Item>
         <Form.Item label="性别">
           {getFieldDecorator('ssex', {
@@ -65,8 +57,7 @@ class AddModuleStudent extends Component {
               showArrow={false}
               filterOption={false}
               onSearch={this.handleSearch}
-              notFoundContent={null}
-            >
+              notFoundContent={null}>
               {options}
             </Select>)}
         </Form.Item>
@@ -76,8 +67,8 @@ class AddModuleStudent extends Component {
 }
 
 @connect((state) => {
-  const { studentItems, page, total, queryValues } = state.student;
-  return { studentItems, page, total, queryValues };
+  const { studentItems, page, total, queryValues, classData } = state.student;
+  return { studentItems, page, total, queryValues, classData };
 })
 export default class StudentManage extends PureComponent {
 
@@ -90,6 +81,7 @@ export default class StudentManage extends PureComponent {
 
   componentDidMount() {
     this.props.dispatch({ type: 'student/getStudentList', payload: {} });
+    this.props.dispatch({ type: 'student/getStudentClass', payload: {} });
   }
 
   showModal = () => {
@@ -117,13 +109,15 @@ export default class StudentManage extends PureComponent {
     if (moment.isMoment(values.sbirthday)) {
       values.sbirthday = moment(values.sbirthday).format('YYYY-MM-DD');
     }
-    this.props.dispatch({ type: 'student/addStudent', payload: { values } });
+    this.props.dispatch({ type: 'student/addStudent', payload: { params: values}});
+  };
+  deleteStudent=(sno)=>{
+    this.props.dispatch({type:'student/deleteStudent',payload:{sno}});
   };
   save = () => {
     const { modalForm } = this;
     modalForm.validateFieldsAndScroll({ force: true }, (err, values) => {
       if (!err) {
-        console.log(values);
         this.addStudent(values);
         this.handleOk();
       }
@@ -132,38 +126,41 @@ export default class StudentManage extends PureComponent {
 
   render() {
     const columns = [{
-      title: 'sno',
+      title: '序号',
+      dataIndex: 'index',
+      key: 'index',
+      render:(text,record,index)=>(<a>{index}</a>)
+    },{
+      title: '学号',
       dataIndex: 'sno',
       key: 'sno',
       render: text => <a href="javascript:;">{text}</a>,
     }, {
-      title: 'sname',
+      title: '姓名',
       dataIndex: 'sname',
       key: 'sname',
     }, {
-      title: 'ssex',
+      title: '性别',
       dataIndex: 'ssex',
       key: 'ssex',
     }, {
-      title: 'sbirthday',
+      title: '生日',
       dataIndex: 'sbirthday',
       key: 'sbirthday',
     }, {
-      title: 'class',
+      title: '班级',
       key: 'class',
       dataIndex: 'class',
     }, {
-      title: 'Action',
+      title: '操作',
       key: 'action',
       render: (text, record) => (
-        <span>
-          <a href="javascript:;">Edit {record.name}</a>
-          <Divider type="vertical"/>
-          <a href="javascript:;">Delete</a>
-        </span>
+        this.props.studentItems.length>=1?
+          (<Popconfirm title={"sure to delete?"} onConfirm={()=>{this.deleteStudent(record.sno)}}>
+            <a href="javascript:;">删除</a>
+          </Popconfirm>):null
       ),
     }];
-
     return (<div>
       <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>新增Student</Button>
       <Table columns={columns} bordered={true} rowKey={record => record.sno} dataSource={this.props.studentItems}/>
@@ -173,9 +170,11 @@ export default class StudentManage extends PureComponent {
         onOk={this.handleOk}
         destroyOnClose={true}
         footer={<Button key="submit" type="primary" onClick={this.save}>确定</Button>}>
-        <AddModuleStudent ref={(form) => {
-          this.modalForm = form;
-        }} dispatch={this.props.dispatch}/>
+        <AddModuleStudent
+          ref={(form) => {this.modalForm = form;}}
+          dispatch={this.props.dispatch}
+          classData={this.props.classData}
+        />
       </Modal>
     </div>);
   }

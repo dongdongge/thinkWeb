@@ -162,7 +162,7 @@ export default class StudentManage extends PureComponent {
       ),
     }];
     return (<div>
-      <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>新增Student</Button>
+      <Button onClick={this.handleAdd} type="primary" style={{ margin: 16 }}>新增Student</Button>
       <Table columns={columns} bordered={true} rowKey={record => record.sno} dataSource={this.props.studentItems}/>
       <Modal
         visible={this.state.visible}

@@ -25,7 +25,12 @@ export async function teacherFindTeacher() {
 export async function teacherAddTeacher(params) {
   return request(`${student}/think/student/add/teacher`,{method:"POST",body:params})
 }
-
+export async function teacherDelete(params) {
+  return request(`${student}/think/student/delete/teacher/${params.tno}`,{method:"DELETE"})
+}
+export async function teacherGetTeacherTno() {
+  return request(`${student}/think/student/find/tno`,{});
+}
 export async function teacherGetDepart() {
   return request(`${student}/think/student/find/depart`,{})
 }

@@ -80,6 +80,11 @@ export function postFile(url, options) {
   return fetchData(url, newOptions)
 }
 
+export function downloadFile(url ,options) {
+
+
+}
+
 function fetchData(url, options) {
   console.log("fetchData",url);
   console.log("options",options);

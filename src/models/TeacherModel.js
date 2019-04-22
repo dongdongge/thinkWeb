@@ -1,4 +1,10 @@
-import { teacherAddTeacher, teacherFindTeacher, teacherGetDepart, teacherGetProf } from '@/services/StudentService';
+import {
+  teacherAddTeacher,
+  teacherDelete,
+  teacherFindTeacher,
+  teacherGetDepart,
+  teacherGetProf, teacherGetTeacherTno,
+} from '@/services/StudentService';
 
 export default {
   namespace: 'teacher',
@@ -17,6 +23,7 @@ export default {
     saveProf(state, { payload: { prof } }) {
       return { ...state, prof };
     },
+
   },
   effects: {
     * getTeacherData({ payload }, { call, put }) {
@@ -25,6 +32,10 @@ export default {
     },
     * addTeacher({ payload }, { call, put }) {
       yield call(teacherAddTeacher, payload.params);
+      yield put({ type: 'getTeacherData', payload: {} });
+    },
+    * deleteTeacher({payload},{call,put}){
+      yield call(teacherDelete,{tno:payload.tno});
       yield put({ type: 'getTeacherData', payload: {} });
     },
 

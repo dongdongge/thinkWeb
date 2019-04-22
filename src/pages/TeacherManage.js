@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react';
-import { Button, DatePicker, Form, Input, Modal, Select, Table } from 'antd';
+import { Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Table } from 'antd';
 import { connect } from 'dva';
 
 const Option = Select.Option;
@@ -8,9 +8,6 @@ const Option = Select.Option;
 class AddTeacherModal extends Component {
   render() {
     const {form,prof,depart} = this.props;
-    console.log("AddTeacherModal");
-    console.log(prof);
-    console.log(depart);
     const { getFieldDecorator } = form;
     const optionsProf =prof?prof.map((item,index) => <Option key={index} value={item}>{item}</Option>):null;
     const optionsDepart = depart?depart.map((item,index) => <Option key={index} value={item}>{item}</Option>):null;
@@ -24,22 +21,22 @@ class AddTeacherModal extends Component {
           <Option value="女">女</Option>
         </Select>)}</Form.Item>
       <Form.Item label={'出生日期'}>  {getFieldDecorator('tbirthday', { rules: [{ required: true, message: 'Please input the 出生日期 of collection!', }], })(<DatePicker format="YYYY-MM-DD"/>)}</Form.Item>
-      <Form.Item label={'职别'}> <Select
+      <Form.Item label={'职别'}> {getFieldDecorator('prof', { rules: [{ required: true, message: 'Please input the 职别 of collection!', }],})(<Select
         showSearch
         defaultActiveFirstOption={false}
         showArrow={false}
         filterOption={false}
         notFoundContent={null}>
         {optionsProf}
-      </Select></Form.Item>
-      <Form.Item label={'院系'}> <Select
+      </Select>)}</Form.Item>
+      <Form.Item label={'院系'}> {getFieldDecorator("depart",{ rules: [{ required: true, message: 'Please input the 院系 of collection!', }],})(<Select
         showSearch
         defaultActiveFirstOption={false}
         showArrow={false}
         filterOption={false}
         notFoundContent={null}>
         {optionsDepart}
-      </Select></Form.Item>
+      </Select>)}</Form.Item>
     </Form>);
   }
 
@@ -74,16 +71,20 @@ export default class TeacherManage extends PureComponent {
     const { modalForm } = this;
     modalForm.validateFieldsAndScroll({ force: true }, (err, values) => {
       if (!err) {
-        this.addStudent(values);
+        this.addTeacher(values);
         this.hiddenModal();
       }
     });
   };
-  render() {
 
-    console.log("TeacherManage");
-    console.log(this.props.prof);
-    console.log(this.props.depart);
+  addTeacher=(values)=>{
+    this.props.dispatch({ type: 'teacher/addTeacher', payload: {params:values} });
+  };
+
+  deleteTeacher=(tno)=>{
+    this.props.dispatch({ type: 'teacher/deleteTeacher', payload: {tno:tno} });
+  };
+  render() {
     const columns = [
       { title: '序号', dataIndex: 'index', key: 'index', render: (text, record, index) => (<a>{index}</a>) },
       { title: '教师编号', dataIndex: 'tno', key: 'tno' },
@@ -92,6 +93,12 @@ export default class TeacherManage extends PureComponent {
       { title: '生日', dataIndex: 'tbirthday', key: 'tbirthday' },
       { title: '职别', dataIndex: 'prof', key: 'prof' },
       { title: '院系', dataIndex: 'depart', key: 'depart' },
+      { title: '操作', dataIndex: 'action', key: 'action',
+        render:(text,record,index)=>(this.props.teacherData.length>=1?
+          (<Popconfirm title={"sure to delete?"} onConfirm={()=>{this.deleteTeacher(record.tno)}}>
+            <a href="javascript:;">删除</a>
+          </Popconfirm>):null)
+      },
     ];
     return (<div>
       <Button type={'primary'} onClick={this.showModal} style={{margin:16}}>新增教师</Button>
